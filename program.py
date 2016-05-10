@@ -1,5 +1,9 @@
 import requests
 import bs4
+import collections
+
+WeatherReport = collections.namedtuple('WeatherReport',
+                                       'cond, temp, scale, loc')
 
 def main():
 
@@ -12,10 +16,10 @@ def main():
     report = get_weather_from_html(html)
 
     print('The temp in {} is {} and {} {}'.format(
-        report[2],
-        report[0],
-        report[1],
-        report[3],
+        report.loc,
+        report.temp,
+        report.scale,
+        report.cond,
     ))
 
 
@@ -28,10 +32,7 @@ def print_the_header():
 
 def get_html_from_web(zipcode):
     url ='http://www.wunderground.com//weather-forecast/{}'.format(zipcode)
-    #print(url)
     response = requests.get(url)
-    #print(response.status_code)
-    #print(response.text[0:250])
 
     return response.text
 
@@ -53,9 +54,9 @@ def get_weather_from_html(html):
     temp = cleanup_text(temp)
     scale = cleanup_text(scale)
 
-
-    # print(condition, temp, scale, loc)
-    return condition, temp, scale, loc
+    #return condition, temp, scale, loc
+    report = WeatherReport(cond=condition, temp=temp, scale=scale, loc=loc)
+    return report
 
 def cleanup_text(text):
     if not text:
